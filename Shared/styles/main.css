@@ -2387,18 +2387,21 @@ body.order-mode-active #order-sidebar {
 /* Desktop video modal sizing fix: ensure visible controls and prevent crop */
 @media (min-width: 769px) {
   .modal-content.image-modal.video-modal {
-    /* Decreased width by 15%, increased height by 10%, then overall size reduced by 10% */
-    width: 71.05%; /* 78.94% * 0.9 */
-    max-width: 711px; /* 790px * 0.9 */
-    /* Allow taller modals on desktop and enable scrolling if necessary */
-    max-height: 91.08vh; /* 101.2vh * 0.9 */
-    overflow-y: auto;
+    /* Responsive sizing that adapts to screen size */
+    width: 85%;
+    max-width: 850px;
+    /* Maintain proper proportions without scrollbars */
+    max-height: 90vh;
+    overflow: hidden;
+    /* Ensure content scales properly */
+    display: flex;
+    flex-direction: column;
   }
   .modal-content.image-modal.video-modal video {
-    /* Keep aspect ratio, avoid clipping bottom controls */
+    /* Make video fully responsive */
     width: 100%;
     height: auto;
-    max-height: calc(92vh - 120px); /* space for title and close button */
+    max-height: calc(90vh - 80px); /* space for title and close button */
     object-fit: contain;
   }
 }
