@@ -1,0 +1,42 @@
+// ============================================
+// BREAKPOINTS GOVERNANCE
+// Single Source of Truth
+// ============================================
+
+$breakpoints: (
+    'xs': 375px,
+    // Mobile Small
+    'sm': 640px,
+    // Mobile Landscape
+    'md': 768px,
+    // Tablet Portrait
+    'lg': 1024px,
+    // Tablet Landscape
+    'xl': 1280px,
+    // Desktop Standard
+    'xxl': 1920px // Desktop Wide
+);
+
+// Universal Mixin (replaces all @media (min-width: XXXpx))
+@mixin respond-to($breakpoint) {
+    $value: map-get($breakpoints, $breakpoint);
+
+    @if $value !=null {
+        @media (min-width: $value) {
+            @content;
+        }
+    }
+
+    @else {
+        @warn "Breakpoint '#{$breakpoint}' not found.";
+    }
+}
+
+// CSS Variables for JS accessibility
+:root {
+    --bp-xs: #{map-get($breakpoints, 'xs')};
+    --bp-sm: #{map-get($breakpoints, 'sm')};
+    --bp-md: #{map-get($breakpoints, 'md')};
+    --bp-lg: #{map-get($breakpoints, 'lg')};
+    --bp-xl: #{map-get($breakpoints, 'xl')};
+}

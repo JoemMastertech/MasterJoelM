@@ -1,0 +1,112 @@
+/* =============================================================================
+   📍 THE ORCHESTRATOR (SASS MIXINS)
+   =============================================================================
+   Centralized responsive logic to replace manual media queries.
+   Usage: @include mobile-portrait { ... }
+   ============================================================================= */
+
+// 1. Base Breakpoints (for reference, though we use them inside logic)
+$bp-mobile: 480px;
+$bp-tablet: 768px;
+$bp-desktop: 1024px;
+$bp-wide: 1200px;
+
+// 2. Orientation Logic
+@mixin landscape {
+    @media (orientation: landscape) {
+        @content;
+    }
+}
+
+@mixin portrait {
+    @media (orientation: portrait) {
+        @content;
+    }
+}
+
+// 3. Device + Orientation Combinations (Semantic Views)
+
+/* Mobile Portrait (Grid: 2 cols, Table: Compact) */
+@mixin mobile-portrait {
+    @include respond-to('xs') {
+        @content;
+    }
+}
+
+/* Mobile Landscape (Often treated as small tablet) */
+@mixin mobile-landscape {
+    @include respond-to('sm') {
+        @content;
+    }
+}
+
+/* Tablet Portrait */
+@mixin tablet-portrait {
+    @include respond-to('md') {
+        @content;
+    }
+}
+
+/* Tablet Landscape / Small Desktop */
+@mixin tablet-landscape {
+    @include respond-to('lg') {
+        @content;
+    }
+}
+
+/* Desktop Wide (Large Screens) */
+@mixin desktop-wide {
+    @include respond-to('xl') {
+        @content;
+    }
+}
+
+/* Standard Desktop */
+@mixin desktop {
+    @media (min-width: #{$bp-desktop}) {
+        @content;
+    }
+}
+
+/* 4. Legacy "Squish" Protocol (Nuclear Option) Helper */
+/* Use this for rules that MUST override everything else on tiny screens */
+@mixin nuclear-mobile {
+    @media (max-width: 480px) {
+        @content;
+    }
+}
+
+/* 5. Legacy Compatibility Layer (Backwards Compatibility) */
+/* Maps old 'respond-to' calls to new semantic mixins */
+/* 5. Legacy Compatibility Layer (Backwards Compatibility) */
+/* Deprecated: Legacy 'respond-to' removed to enforce Single Source of Truth in _breakpoints.scss */
+
+@mixin mobile-only {
+    @include mobile-portrait {
+        @content;
+    }
+}
+
+/* =================================================================
+   6. ANIMATION SYSTEMS (Robustness Layer)
+   ================================================================= */
+/**
+ * @mixin stagger-children
+ * Automates the "Curtain Effect" logic (Anti-Pile Up).
+ * @param $count: Number of items to support (default: 20)
+ * @param $initial-delay: Start time offset (default: 0.05s)
+ * @param $step: Increment per item (default: 0.05s)
+ */
+@mixin stagger-children($count: 20, $initial-delay: 0.05s, $step: 0.05s) {
+    /* Base State: Invisible */
+    opacity: 0;
+    /* Action: Enter smoothly */
+    animation: fadeIn 0.6s ease-out forwards;
+
+    /* The Loop (Choreography) */
+    @for $i from 1 through $count {
+        &:nth-child(#{$i}) {
+            animation-delay: #{$initial-delay + ($i * $step)};
+        }
+    }
+}

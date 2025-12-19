@@ -1,0 +1,191 @@
+// ============================================
+// APP SHELL LAYOUT SYSTEM - RESPONSIVE
+// Mobile First Approach
+// ============================================
+
+// BASE: Mobile (xs - 375px)
+.app-container.grid-shell-mode {
+    display: grid;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+
+    /* Mobile: Single column */
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "content";
+
+    gap: 0;
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mobile: Nav & Sidebar are OVERLAYS */
+.app-container.grid-shell-mode nav.sidebar-navigation,
+.app-container.grid-shell-mode #order-sidebar {
+    position: fixed !important;
+    z-index: 1000;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--card-bg, #1a1a1a);
+    /* Fallback color */
+    border-left: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+/* Nav specific overlay logic */
+.app-container.grid-shell-mode nav.sidebar-navigation {
+    left: -280px;
+    top: 0;
+    width: 280px;
+    border-right: 1px solid var(--border-color);
+    border-left: none;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Open state for Nav (controlled by JS) */
+.app-container.grid-shell-mode[data-nav-open="true"] nav.sidebar-navigation {
+    left: 0;
+}
+
+
+/* Sidebar specific overlay logic */
+.app-container.grid-shell-mode #order-sidebar {
+    right: -350px;
+    top: 0;
+    width: 350px;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Open state for Sidebar */
+.app-container.grid-shell-mode[data-sidebar-state="open"] #order-sidebar {
+    right: 0;
+}
+
+
+// ========================================
+// TABLET: md (1024px)
+// ========================================
+@include respond-to('md') {
+    .app-container.grid-shell-mode {
+        /* Tablet: Nav in grid, Sidebar as overlay */
+        grid-template-columns: 80px 1fr;
+        grid-template-areas: "nav content";
+    }
+
+    /* Nav returns to grid */
+    .app-container.grid-shell-mode nav.sidebar-navigation {
+        position: static !important;
+        left: unset !important;
+        top: unset !important;
+        width: 100% !important;
+        /* Fills the 80px grid slot */
+        height: 100% !important;
+        background: unset;
+        grid-area: nav;
+        transition: none;
+        z-index: var(--z-nav);
+    }
+
+    /* Sidebar stays as overlay, but ensures correct width/pos */
+    .app-container.grid-shell-mode #order-sidebar {
+        position: fixed !important;
+        right: -350px;
+        top: 0;
+        width: 350px !important;
+        z-index: var(--z-sidebar);
+    }
+}
+
+// ========================================
+// DESKTOP: xl (1280px+)
+// ========================================
+@include respond-to('xl') {
+    .app-container.grid-shell-mode {
+        /* Desktop: Full Grid Shell */
+        grid-template-columns: 80px 1fr var(--sidebar-width, 0px);
+        grid-template-areas: "nav content sidebar";
+    }
+
+    /* Sidebar returns to grid */
+    .app-container.grid-shell-mode #order-sidebar {
+        position: static !important;
+        grid-area: sidebar;
+        right: unset !important;
+        top: unset !important;
+        width: 100% !important;
+        /* Fills variable column */
+        height: 100% !important;
+        max-height: 100vh !important;
+        background: unset;
+        border-left: 1px solid var(--border-color);
+        transition: none;
+        z-index: var(--z-sidebar);
+    }
+
+    /* Reset overlay transform hack if any */
+    .app-container.grid-shell-mode[data-sidebar-state="open"] #order-sidebar {
+        right: unset;
+    }
+}
+
+// ========================================
+// Z-INDEX GOVERNANCE & BACKDROP
+// ========================================
+.app-container.grid-shell-mode {
+    --z-nav: 100;
+    --z-content: 50;
+    --z-sidebar: 90;
+    --z-backdrop: 999;
+
+    nav.sidebar-navigation {
+        z-index: var(--z-nav);
+    }
+
+    .main-content-screen {
+        z-index: var(--z-content);
+    }
+
+    #order-sidebar {
+        z-index: var(--z-sidebar);
+    }
+}
+
+/* Backdrop for overlays (Mobile/Tablet) */
+.app-container.grid-shell-mode::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-backdrop);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    /* Click through when hidden */
+}
+
+/* Show backdrop when overlay is active */
+/* NOTE: We only want backdrop when Elements are in OVERLAY mode */
+/* Strategy: Use specific selectors or media queries to limit backdrop */
+
+@media (max-width: 1279px) {
+
+    /* Below Desktop */
+    .app-container.grid-shell-mode[data-sidebar-state="open"]::before {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+    }
+}
+
+@media (max-width: 1023px) {
+
+    /* Below Tablet */
+    .app-container.grid-shell-mode[data-nav-open="true"]::before {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+    }
+}
